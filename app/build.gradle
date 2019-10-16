@@ -16,13 +16,13 @@ android {
 
     signingConfigs {
         test1 {
-            storeFile file('../jks/test1')
+            storeFile file('../jks/test1.jks')
             storePassword "123456"
             keyAlias "key0"
             keyPassword "123456"
         }
         test2 {
-            storeFile file('../jks/test2')
+            storeFile file('../jks/test2.jks')
             storePassword "123456"
             keyAlias "key0"
             keyPassword "123456"
@@ -36,6 +36,7 @@ android {
             zipAlignEnabled true
             minifyEnabled false
             shrinkResources false
+            signingConfig null // 配置debug模式下的签名，在productFlavors里面配置
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
         }
 

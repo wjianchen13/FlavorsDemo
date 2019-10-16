@@ -60,12 +60,12 @@ flavorDimensions配置如下：
         }
     }
 ```
-buildTypes常用配置字段的含义：
-debbuggable	否生成一个可调式的apk
-minifyEnabled	打开混淆
-multiDexEnabled	是否可以分包
-proguardFiles	指定插件使用的混淆文件
-zipAlignEnabled	是否使用zipAlign优化apk,Android sdk包里面的工具，能够对打包的应用程序进行优化，让整个系统运行的更快
+buildTypes常用配置字段的含义：<br/>
+debbuggable	否生成一个可调式的apk<br/>
+minifyEnabled	打开混淆<br/>
+multiDexEnabled	是否可以分包<br/>
+proguardFiles	指定插件使用的混淆文件<br/>
+zipAlignEnabled	是否使用zipAlign优化apk,Android sdk包里面的工具，能够对打包的应用程序进行优化，让整个系统运行的更快<br/>
 shrinkResources 打开资源压缩
 
 ## 配置productFlavors
