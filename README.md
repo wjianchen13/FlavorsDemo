@@ -93,6 +93,8 @@ shrinkResources 打开资源压缩
 这样配置完成之后，就可以点击工具栏上面的sync project按钮同步project了，同步完成后可以再Build Variants里面查看
 配置的渠道
 
+![variant](./docs/images/variant.png)
+
 ## license
 
     Copyright 2019 wjianchen13
