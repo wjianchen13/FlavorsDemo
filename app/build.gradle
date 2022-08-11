@@ -1,9 +1,24 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+
+    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
+    rootProject.ext.currentFlavor = getCurrentFlavor()
+    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
+    println("=================> current: " + getCurrentFlavor())
+
+    rootProject.ext.currentInfo = getFlavorInfo()
+    rootProject.ext.currentInfo.each { data ->
+        println("=================> key: " + data.key + "  value: " + getAttribute(data.key))
+    }
+
     defaultConfig {
+        println("=================> defaultConfig currentFlavor: " + rootProject.ext.currentFlavor)
         applicationId "com.cold.flavorsdemo"
         minSdkVersion 15
         targetSdkVersion 29
@@ -15,6 +30,7 @@ android {
     flavorDimensions "company", "version"
 
     signingConfigs {
+        println("=================> signingConfigs currentFlavor: " + rootProject.ext.currentFlavor)
         test1 {
             storeFile file('../jks/test1.jks')
             storePassword "123456"
@@ -30,6 +46,7 @@ android {
     }
 
     buildTypes {
+        println("=================> buildTypes currentFlavor: " + rootProject.ext.currentFlavor)
         other {
             debuggable true
             jniDebuggable true
@@ -57,6 +74,7 @@ android {
     }
 
     productFlavors {
+        println("=================> productFlavors currentFlavor: " + rootProject.ext.currentFlavor)
         c_vivo {
             dimension "company"
         }
@@ -72,7 +90,65 @@ android {
         }
     }
 
+//    isDebug = true
+
+    sourceSets {
+        println("=================> sourceSets currentFlavor: " + rootProject.ext.currentFlavor)
+
+        v_test1 {
+
+        }
+
+        v_test2 {
+
+        }
+
+        sourceSets.all { sourceSet ->
+            if(rootProject.ext.isDebug) {
+                manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
+                java.srcDirs += ['src/flavor/debug/src']
+                res.srcDirs += ['src/flavor/debug/res']
+            } else {
+                java.srcDirs += ['src/flavor/debug/src']
+            }
+        }
+    }
+
+
+
 }
+
+def getAttribute(String key) {
+    rootProject.ext.currentInfo.get(key)
+}
+
+def getFlavorInfo() {
+    def name = getCurrentFlavor()
+    println("=================> name: " + name)
+    return rootProject.ext.productConfig.get(name)
+}
+
+def getCurrentFlavor() {
+    Gradle gradle = getGradle()
+    String  tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+
+    Pattern pattern;
+    println("=================> tskReqStr: " + tskReqStr)
+    if( tskReqStr.contains( "assemble" ) )
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    else
+        pattern = Pattern.compile("bundle(\\w+)(Release|Debug)")
+
+    Matcher matcher = pattern.matcher( tskReqStr )
+
+    if( matcher.find())
+        return matcher.group(1).toLowerCase()
+    else {
+        println "NO MATCH FOUND"
+        return "";
+    }
+}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

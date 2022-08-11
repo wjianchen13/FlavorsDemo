@@ -93,6 +93,9 @@ shrinkResources 打开资源压缩
 这样配置完成之后，就可以点击工具栏上面的sync project按钮同步project了，同步完成后可以再Build Variants里面查看
 配置的渠道
 
+## 添加debug配置
+debug加入debug相关的代码和资源，release则是另外的资源
+
 ![variant](./docs/images/variant.png)
 
 ## license

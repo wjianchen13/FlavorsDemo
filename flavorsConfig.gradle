@@ -1,0 +1,34 @@
+ext {
+
+    // 打包时改成对应的flavor name
+    currentFlavor = 'alomet'
+
+    isDebug = true
+
+    // 当前谷歌aab渠道 gf00001 正式服release 测试服debug渠道号test001
+    channel = 'gf00001'
+    testChannel = 'test001'
+
+    Map currentInfo = null
+
+    productConfig = [
+            c_vivov_test1 : [
+                app_name : "Alomet",
+                versionCode : 663,
+                versionName : '6.6.3',
+                channel : testChannel,
+                curFlavorName : 'honeychat',
+                isVisitor : false, // 是否显示游客登录
+                isMarket : false
+        ],
+            c_vivov_test2 : [ // 市场包
+                 app_name : "Alomet_market",
+                 versionCode : 658,
+                 versionName : '6.5.8',
+                 channel : 'gf00002',
+                 curFlavorName : 'alometMarket',
+                 isVisitor : true,
+                 isMarket : true
+        ]
+    ]
+}
