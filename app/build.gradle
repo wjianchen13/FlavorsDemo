@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -7,10 +8,10 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
 
-    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
+//    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
     rootProject.ext.currentFlavor = getCurrentFlavor()
-    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
-    println("=================> current: " + getCurrentFlavor())
+//    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
+//    println("=================> current: " + getCurrentFlavor())
 
     rootProject.ext.currentInfo = getFlavorInfo()
     rootProject.ext.currentInfo.each { data ->
@@ -67,7 +68,7 @@ android {
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -114,7 +115,111 @@ android {
         }
     }
 
+    /**
+     * 自定义apk文件名
+     */
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def fileName
+            def info = getFlavorInfo()
+            if(info == null)
+                return
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (variant.buildType.name.equals('release')) { // 这里只是设置outputFileName这个变量，只有release才会设置，打包release时输出apk就会在该路径下
+                    fileName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${info.get('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.apk"
+                    outputFileName = new File("../../../../../../outputApk/${new SimpleDateFormat("yy_MM_dd").format(new Date())}", fileName).toString()
+                }
+            }
+        }
 
+        /**
+         * mapping文件
+         **/
+        if (variant.getBuildType().isMinifyEnabled()) {
+            variant.assemble.doLast {
+                def info = getFlavorInfo()
+                if(info == null)
+                    return
+                String desktopDir = "${rootProject.rootDir}\\outputMapping"
+                File cacheFile = new File(desktopDir + java.io.File.separator + (new java.text.SimpleDateFormat("yy_MM_dd").format(new Date())))
+                if (!cacheFile.exists())
+                    cacheFile.mkdirs()
+                def mappingDir = cacheFile.getPath()
+                if (variant.mappingFile.exists()) {
+                    def copyName = "${info.get('app_name')}_ ${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}_apk.txt"
+                    copy {
+                        from variant.mappingFile
+                        into mappingDir
+                        rename {
+                            copyName
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 备份aab
+    /**
+     * 这个文件名有问题，中间少了一条 -
+     * "app-${rootProject.ext.currentFlavor}-release.aab"
+     */
+    tasks.whenTaskAdded { task ->
+        if (task.name.startsWith("bundle")) {
+            def info = getFlavorInfo()
+            if(info == null)
+                return
+            def flavor = task.name.substring("bundle".length()).uncapitalize()
+            println("=================> equalsIgnoreCase2 flavor: " +  flavor)
+            println("=================> equalsIgnoreCase2 flavor1: ${rootProject.ext.currentFlavor}" )
+            if(flavor.equalsIgnoreCase("${rootProject.ext.currentFlavor}Release")) {
+                println("=================> equalsIgnoreCase1 ")
+                def renameTaskName = "rename${task.name.capitalize()}Aab"
+                println("=================> equalsIgnoreCase2 flavor: " +  flavor)
+                def fromPath = "${buildDir}\\outputs\\bundle\\${flavor}\\"
+                def archive = "app-${rootProject.ext.currentFlavor}-release.aab"
+                println("=================> equalsIgnoreCase3 rootProject.ext.currentFlavor: " +  "${rootProject.ext.currentFlavor}")
+                def myName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${info.get('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.aab"
+                def dest = "../outputApk/${currentData()}/"
+                Task renameTask = tasks.create(renameTaskName) {
+                    doLast {
+                        copy {
+                            println("=================> equalsIgnoreCase2 copy: " )
+                            from new File("${fromPath}${archive}")
+                            println("=================> equalsIgnoreCase3 from: " + "${fromPath}${archive}")
+                            into dest
+                            println("=================> equalsIgnoreCase3 dest: " + dest)
+                            rename {
+                                myName
+                            }
+                        }
+                    }
+                }
+
+                task.finalizedBy(renameTaskName)
+                def copyMappingTaskName = "copy${task.name.capitalize()}Mapping"
+                def mappingFromPath = "${buildDir}/outputs/mapping/${flavor}/"
+                String desktopDir = "${rootProject.rootDir}\\outputMapping"
+                File cacheFile = new File(desktopDir + java.io.File.separator + new java.text.SimpleDateFormat("yy_MM_dd").format(new Date()));
+                if (!cacheFile.exists())
+                    cacheFile.mkdirs()
+                def mappingDestDir = cacheFile.getPath()
+                def mappingFileName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_aab.txt"
+                tasks.create(copyMappingTaskName) {
+                    doLast {
+                        copy {
+                            from new File("${mappingFromPath}mapping.txt")
+                            into mappingDestDir
+                            rename {
+                                mappingFileName
+                            }
+                        }
+                    }
+                }
+                renameTask.finalizedBy(copyMappingTaskName)
+            }
+        }
+    }
 
 }
 
@@ -148,6 +253,15 @@ def getCurrentFlavor() {
         return "";
     }
 }
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm-ss")
+}
+
+def currentData() {
+    return new SimpleDateFormat("yy_MM_dd").format(new Date())
+}
+
 
 
 dependencies {

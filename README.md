@@ -98,6 +98,25 @@ debug加入debug相关的代码和资源，release则是另外的资源
 
 ![variant](./docs/images/variant.png)
 
+## 添加多渠道打包用法
+1.添加自定义apk文件名
+2.复制mapping文件到固定目录，实现备份功能
+3.备份aab
+4.备份aab mapping文件
+
+## 注意问题
+1.添加自定义输出apk文件名的时候，发现执行一次gradlew assembleC_vivoV_test1Release输出文件名后，再次执行不会输出了
+然后重新删除app下的build目录，再次执行才可以输出。
+可能原因是，打包时app/build/output/apk/c_vivoV_test1/release目录下有个output-metadata.json的文件在文件里面记录了
+新的apk路径
+      "outputFile": "..\\..\\..\\..\\..\\..\\outputApk\\22_08_12\\Alomet_v1.0_1_2022-08-12_14-00-07_test001_Debug.apk"
+打包的时候gradle应该也有这个outputFile的缓存，如果缓存一样，gradle直接就不输出文件了，如果修改上面outputFile的值，
+即使不删除build目录，gradle打包也会有新的apk文件输出
+
+
+
+
+
 ## license
 
     Copyright 2019 wjianchen13
