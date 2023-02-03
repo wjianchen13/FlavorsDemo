@@ -13,6 +13,9 @@ flavorDimensions配置如下：
 ```Groovy
     flavorDimensions "company", "version"
 ```
+android 3.0只有也可以配置flavorDimensions "default"，这样将不需要在productFlavors配置dimension这个维度，
+相当于直接忽略了flavorDimensions，只有productFlavors这个维度了。
+
 ## 配置signingConfigs
 这个是配置签名文件的，signingConfigs的配置需要在productFlavors前面，否则productFlavors
 里面使用signingConfigs会报错
