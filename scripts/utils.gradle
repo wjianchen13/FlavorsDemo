@@ -1,0 +1,29 @@
+println("======================> utils.gradle: ")
+ext {
+    isCurrentFlavorNotNull= this.&isCurrentFlavorNotNull
+    getConfigValue= this.&getConfigValue
+}
+
+/**
+ * 当前flavor是否为空，点击运行程序和使用assembleRelease打包不会为空
+ * 如果同步就会为空，为空就不设置相关的属性，因为拿不到。
+ * 也可以默认设置一个flavor的属性，但是这个是不对的
+ * @return
+ */
+def isCurrentFlavorNotNull() {
+    println("======================> isCurrentFlavorNotNull22: " + rootProject.currentFlavor)
+    return rootProject.currentFlavor
+}
+
+def getConfigValue(key) {
+    println("======================> getConfigValue key: " + key)
+    println("======================> getConfigValue rootProject.productConfig: " + rootProject.productConfig)
+    println("======================> getConfigValue rootProject.currentFlavor: " + rootProject.currentFlavor)
+    if(rootProject.currentFlavor)
+        return rootProject.productConfig.get(rootProject.currentFlavor).get(key)
+    return ""
+}
+
+
+
+

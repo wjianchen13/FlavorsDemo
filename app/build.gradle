@@ -9,7 +9,7 @@ android {
     buildToolsVersion "29.0.2"
 
 //    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
-    rootProject.ext.currentFlavor = getCurrentFlavor()
+//    rootProject.ext.currentFlavor = getCurrentFlavor()
 //    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
 //    println("=================> current: " + getCurrentFlavor())
 
@@ -23,12 +23,12 @@ android {
         applicationId "com.cold.flavorsdemo"
         minSdkVersion 15
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    flavorDimensions "company", "version"
+    flavorDimensions "type", "version"
 
     signingConfigs {
         println("=================> signingConfigs currentFlavor: " + rootProject.ext.currentFlavor)
@@ -76,16 +76,20 @@ android {
 
     productFlavors {
         println("=================> productFlavors currentFlavor: " + rootProject.ext.currentFlavor)
-        c_vivo {
-            dimension "company"
+        google {
+            dimension "type"
         }
 
-        v_test1 {
+        market {
+            dimension "type"
+        }
+
+        Ayome {
             signingConfig signingConfigs.test1
             dimension "version"
         }
 
-        v_test2 {
+        Ayome1 {
             signingConfig signingConfigs.test2
             dimension "version"
         }
@@ -96,21 +100,39 @@ android {
     sourceSets {
         println("=================> sourceSets currentFlavor: " + rootProject.ext.currentFlavor)
 
-        v_test1 {
-
-        }
-
-        v_test2 {
-
-        }
+//        v_test1 {
+//
+//        }
+//
+//        v_test2 {
+//
+//        }
 
         sourceSets.all { sourceSet ->
-            if(rootProject.ext.isDebug) {
-                manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
-                java.srcDirs += ['src/flavor/debug/src']
-                res.srcDirs += ['src/flavor/debug/res']
-            } else {
-                java.srcDirs += ['src/flavor/debug/src']
+//            if(rootProject.ext.isDebug) {
+//                manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
+//                java.srcDirs += ['src/flavor/debug/src']
+//                res.srcDirs += ['src/flavor/debug/res']
+//            } else {
+//                java.srcDirs += ['src/flavor/debug/src']
+//            }
+
+            //            println("=================> sourceSets name1: ${sourceSet.name}")
+            def name = getFlavorName(sourceSet.name)
+//            println("=================> sourceSet name2: ${name}")
+            def info = getFlavorsInfo(name)
+            if(sourceSet != null
+                    && info != null
+                    && sourceSet.toString().contains(name) != null) {
+//                main.java.srcDirs += ['src/flavor/debug/src']
+//                println("=================> sourceSet name3: ${name}")
+                if(rootProject.isDebug) {
+                    sourceSet.java.srcDirs += ['src/flavor/debug/src']
+                    sourceSet.res.srcDirs += ['src/flavor/debug/res']
+                    sourceSet.manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
+                } else {
+                    java.srcDirs += ['src/flavor/release/src']
+                }
             }
         }
     }
@@ -223,13 +245,28 @@ android {
 
 }
 
+def String getFlavorName(String name){
+    if (!name)
+        return "";
+    return name
+            .toLowerCase()
+            .replaceAll("debug", "")
+            .replaceAll("release", "")
+            .replaceAll("test","")
+            .replaceAll("android", "");
+}
+
+def getFlavorsInfo(String flavor) {
+    return rootProject.ext.productConfig.get(flavor)
+}
+
 def getAttribute(String key) {
     rootProject.ext.currentInfo.get(key)
 }
 
 def getFlavorInfo() {
     def name = getCurrentFlavor()
-    println("=================> name: " + name)
+//    println("=================> name: " + name)
     return rootProject.ext.productConfig.get(name)
 }
 
@@ -238,7 +275,7 @@ def getCurrentFlavor() {
     String  tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
 
     Pattern pattern;
-    println("=================> tskReqStr: " + tskReqStr)
+//    println("=================> tskReqStr: " + tskReqStr)
     if( tskReqStr.contains( "assemble" ) )
         pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
     else
@@ -249,7 +286,7 @@ def getCurrentFlavor() {
     if( matcher.find())
         return matcher.group(1).toLowerCase()
     else {
-        println "NO MATCH FOUND"
+//        println "NO MATCH FOUND"
         return "";
     }
 }
