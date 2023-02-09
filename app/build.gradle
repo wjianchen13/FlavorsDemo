@@ -13,10 +13,10 @@ android {
 //    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
 //    println("=================> current: " + getCurrentFlavor())
 
-    rootProject.ext.currentInfo = getFlavorInfo()
-    rootProject.ext.currentInfo.each { data ->
-        println("=================> key: " + data.key + "  value: " + getAttribute(data.key))
-    }
+//    rootProject.ext.currentInfo = getFlavorInfo()
+//    rootProject.ext.currentInfo.each { data ->
+//        println("=================> key: " + data.key + "  value: " + getAttribute(data.key))
+//    }
 
     defaultConfig {
         println("=================> defaultConfig currentFlavor: " + rootProject.ext.currentFlavor)
@@ -84,12 +84,25 @@ android {
             dimension "type"
         }
 
-        Ayome {
+        ayome {
             signingConfig signingConfigs.test1
             dimension "version"
+
+            if (isCurrentFlavorNotNull()) {
+                versionCode getConfigValue('versionCode')
+                versionCode getConfigValue('versionCode')
+                versionName "${getConfigValue('versionName')}"
+                buildConfigField "String", "WX_KEY", "\"wx7ecd5e9701f3adaf\""
+                buildConfigField "String", "WX_SECRET", "\"af9a655b3437b86a27b649272d3c0f0e\""
+                buildConfigField "String", "PACKGE_TYPE", "\"match\""
+                buildConfigField "String", "CHANNEL", "\"${getConfigValue('channel')}\""
+                buildConfigField "boolean", "IS_VISITOR", "${getConfigValue('isVisitor')}"
+                buildConfigField "boolean", "IS_MARKET", "${getConfigValue('isMarket')}"
+                resValue("string", "app_name", "\"${getConfigValue('app_name')}\"")
+            }
         }
 
-        Ayome1 {
+        ayome1 {
             signingConfig signingConfigs.test2
             dimension "version"
         }
@@ -143,12 +156,11 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all {
             def fileName
-            def info = getFlavorInfo()
-            if(info == null)
-                return
-            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                if (variant.buildType.name.equals('release')) { // 这里只是设置outputFileName这个变量，只有release才会设置，打包release时输出apk就会在该路径下
-                    fileName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${info.get('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.apk"
+//            println("=====================> isCurrentFlavorNotNull(): " + isCurrentFlavorNotNull())
+            if(isCurrentFlavorNotNull() && outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (variant.buildType.name.equals('release')) {
+                    // 这里只是设置outputFileName这个变量，只有release才会设置，打包release时输出apk就会在该路径下
+                    fileName = "${getConfigValue('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${getConfigValue('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.apk"
                     outputFileName = new File("../../../../../../outputApk/${new SimpleDateFormat("yy_MM_dd").format(new Date())}", fileName).toString()
                 }
             }
@@ -159,21 +171,20 @@ android {
          **/
         if (variant.getBuildType().isMinifyEnabled()) {
             variant.assemble.doLast {
-                def info = getFlavorInfo()
-                if(info == null)
-                    return
-                String desktopDir = "${rootProject.rootDir}\\outputMapping"
-                File cacheFile = new File(desktopDir + java.io.File.separator + (new java.text.SimpleDateFormat("yy_MM_dd").format(new Date())))
-                if (!cacheFile.exists())
-                    cacheFile.mkdirs()
-                def mappingDir = cacheFile.getPath()
-                if (variant.mappingFile.exists()) {
-                    def copyName = "${info.get('app_name')}_ ${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}_apk.txt"
-                    copy {
-                        from variant.mappingFile
-                        into mappingDir
-                        rename {
-                            copyName
+                if(isCurrentFlavorNotNull()) {
+                    String desktopDir = "${rootProject.rootDir}\\outputMapping"
+                    File cacheFile = new File(desktopDir + java.io.File.separator + (new java.text.SimpleDateFormat("yy_MM_dd").format(new Date())))
+                    if (!cacheFile.exists())
+                        cacheFile.mkdirs()
+                    def mappingDir = cacheFile.getPath()
+                    if (variant.mappingFile.exists()) {
+                        def copyName = "${getConfigValue('app_name')}_ ${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}_apk.txt"
+                        copy {
+                            from variant.mappingFile
+                            into mappingDir
+                            rename {
+                                copyName
+                            }
                         }
                     }
                 }
@@ -188,57 +199,61 @@ android {
      */
     tasks.whenTaskAdded { task ->
         if (task.name.startsWith("bundle")) {
-            def info = getFlavorInfo()
-            if(info == null)
-                return
-            def flavor = task.name.substring("bundle".length()).uncapitalize()
-            println("=================> equalsIgnoreCase2 flavor: " +  flavor)
-            println("=================> equalsIgnoreCase2 flavor1: ${rootProject.ext.currentFlavor}" )
-            if(flavor.equalsIgnoreCase("${rootProject.ext.currentFlavor}Release")) {
-                println("=================> equalsIgnoreCase1 ")
-                def renameTaskName = "rename${task.name.capitalize()}Aab"
-                println("=================> equalsIgnoreCase2 flavor: " +  flavor)
-                def fromPath = "${buildDir}\\outputs\\bundle\\${flavor}\\"
-                def archive = "app-${rootProject.ext.currentFlavor}-release.aab"
-                println("=================> equalsIgnoreCase3 rootProject.ext.currentFlavor: " +  "${rootProject.ext.currentFlavor}")
-                def myName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${info.get('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.aab"
-                def dest = "../outputApk/${currentData()}/"
-                Task renameTask = tasks.create(renameTaskName) {
-                    doLast {
-                        copy {
-                            println("=================> equalsIgnoreCase2 copy: " )
-                            from new File("${fromPath}${archive}")
-                            println("=================> equalsIgnoreCase3 from: " + "${fromPath}${archive}")
-                            into dest
-                            println("=================> equalsIgnoreCase3 dest: " + dest)
-                            rename {
-                                myName
+//            def info = getFlavorInfo()
+            if(isCurrentFlavorNotNull()) {
+//                println("=================================================> task.name: " + task.name)
+                def flavor = task.name.substring("bundle".length()).uncapitalize()
+//                println("=================================================> equalsIgnoreCase2 flavor: " + flavor)
+                def variantNameRelease = "${rootProject.ext.curVariantsName}Release"
+                if (flavor.equalsIgnoreCase(variantNameRelease)) {
+                    println("==================================================================================================================================================> equalsIgnoreCase1 ")
+                    def renameTaskName = "rename${task.name.capitalize()}Aab"
+                    println("=================> equalsIgnoreCase2 flavor: " + flavor)
+                    def fromPath = "${buildDir}\\outputs\\bundle\\${flavor}\\"
+                    println("=================> equalsIgnoreCase3 fromPath: " + fromPath)
+                    // app-google-ayome-release.aab
+                    def archive = "app-${getConfigValue('group')}-${rootProject.ext.currentFlavor}-release.aab"
+                    println("=================> equalsIgnoreCase3 rootProject.ext.currentFlavor: " + "${rootProject.ext.currentFlavor}")
+                    println("=================> equalsIgnoreCase3 archive: " + archive)
+                    def myName = "${getConfigValue('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${getConfigValue('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.aab"
+                    def dest = "../outputApk/${currentData()}/"
+                    Task renameTask = tasks.create(renameTaskName) {
+                        doLast {
+                            copy {
+                                println("=================> equalsIgnoreCase2 copy: ")
+                                from new File("${fromPath}${archive}")
+                                println("=================> equalsIgnoreCase3 from: " + "${fromPath}${archive}")
+                                into dest
+                                println("=================> equalsIgnoreCase3 dest: " + dest)
+                                rename {
+                                    myName
+                                }
                             }
                         }
                     }
-                }
 
-                task.finalizedBy(renameTaskName)
-                def copyMappingTaskName = "copy${task.name.capitalize()}Mapping"
-                def mappingFromPath = "${buildDir}/outputs/mapping/${flavor}/"
-                String desktopDir = "${rootProject.rootDir}\\outputMapping"
-                File cacheFile = new File(desktopDir + java.io.File.separator + new java.text.SimpleDateFormat("yy_MM_dd").format(new Date()));
-                if (!cacheFile.exists())
-                    cacheFile.mkdirs()
-                def mappingDestDir = cacheFile.getPath()
-                def mappingFileName = "${info.get('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_aab.txt"
-                tasks.create(copyMappingTaskName) {
-                    doLast {
-                        copy {
-                            from new File("${mappingFromPath}mapping.txt")
-                            into mappingDestDir
-                            rename {
-                                mappingFileName
+                    task.finalizedBy(renameTaskName)
+                    def copyMappingTaskName = "copy${task.name.capitalize()}Mapping"
+                    def mappingFromPath = "${buildDir}/outputs/mapping/${flavor}/"
+                    String desktopDir = "${rootProject.rootDir}\\outputMapping"
+                    File cacheFile = new File(desktopDir + java.io.File.separator + new java.text.SimpleDateFormat("yy_MM_dd").format(new Date()));
+                    if (!cacheFile.exists())
+                        cacheFile.mkdirs()
+                    def mappingDestDir = cacheFile.getPath()
+                    def mappingFileName = "${getConfigValue('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_aab.txt"
+                    tasks.create(copyMappingTaskName) {
+                        doLast {
+                            copy {
+                                from new File("${mappingFromPath}mapping.txt")
+                                into mappingDestDir
+                                rename {
+                                    mappingFileName
+                                }
                             }
                         }
                     }
+                    renameTask.finalizedBy(copyMappingTaskName)
                 }
-                renameTask.finalizedBy(copyMappingTaskName)
             }
         }
     }

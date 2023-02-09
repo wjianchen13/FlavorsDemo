@@ -11,14 +11,14 @@ ext {
  * @return
  */
 def isCurrentFlavorNotNull() {
-    println("======================> isCurrentFlavorNotNull22: " + rootProject.currentFlavor)
+//    println("======================> isCurrentFlavorNotNull22: " + rootProject.currentFlavor)
     return rootProject.currentFlavor
 }
 
 def getConfigValue(key) {
-    println("======================> getConfigValue key: " + key)
-    println("======================> getConfigValue rootProject.productConfig: " + rootProject.productConfig)
-    println("======================> getConfigValue rootProject.currentFlavor: " + rootProject.currentFlavor)
+//    println("======================> getConfigValue key: " + key)
+//    println("======================> getConfigValue rootProject.productConfig: " + rootProject.productConfig)
+//    println("======================> getConfigValue rootProject.currentFlavor: " + rootProject.currentFlavor)
     if(rootProject.currentFlavor)
         return rootProject.productConfig.get(rootProject.currentFlavor).get(key)
     return ""

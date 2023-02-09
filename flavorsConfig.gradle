@@ -59,7 +59,6 @@ def checkCurFlavor() {
     }
     else if (tskReqStr.contains("bundle")) {
         pattern = Pattern.compile("bundle(\\w+)(Release|Debug|Beta)")
-        rootProject.isBundle = true
     } else {
         pattern = Pattern.compile("generate(\\w+)(Release|Debug|Beta)")
     }
