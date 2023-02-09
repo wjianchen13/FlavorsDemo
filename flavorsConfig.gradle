@@ -37,6 +37,7 @@ ext {
                     isMarket : true
         ]
     ]
+    realFlavorName= this.&realFlavorName
     checkCurFlavor()
     currentInfo = getCurrentFlavor(rootProject)
 }
@@ -50,6 +51,7 @@ def checkCurFlavor() {
     String tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
 
     println("=======================> tskReqStr:" + tskReqStr)
+    println("=======================> rootProject name:" + project.getName())
     Pattern pattern;
 
     if (tskReqStr.contains("assemble")) {
@@ -115,8 +117,6 @@ def String realFlavorName(String mergeFlavorName){
             .toLowerCase()
             .replaceAll("google", "")
             .replaceAll("market", "")
-            .replaceAll("c_inter", "")
-            .replaceAll("z_anchor", "")
             .replaceAll("debug", "")
             .replaceAll("release", "")
             .replaceAll("test","")

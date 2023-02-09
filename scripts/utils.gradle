@@ -1,7 +1,15 @@
+import java.text.SimpleDateFormat
+
 println("======================> utils.gradle: ")
+/**
+ * 导出函数，全局访问
+ */
 ext {
     isCurrentFlavorNotNull= this.&isCurrentFlavorNotNull
     getConfigValue= this.&getConfigValue
+    releaseTime= this.&releaseTime
+    currentData= this.&currentData
+    getFlavorsInfo = this.&getFlavorsInfo
 }
 
 /**
@@ -15,6 +23,11 @@ def isCurrentFlavorNotNull() {
     return rootProject.currentFlavor
 }
 
+/**
+ * 获取当前flavor key对应的属性值
+ * @param key
+ * @return
+ */
 def getConfigValue(key) {
 //    println("======================> getConfigValue key: " + key)
 //    println("======================> getConfigValue rootProject.productConfig: " + rootProject.productConfig)
@@ -22,6 +35,23 @@ def getConfigValue(key) {
     if(rootProject.currentFlavor)
         return rootProject.productConfig.get(rootProject.currentFlavor).get(key)
     return ""
+}
+
+/**
+ * 获取flavor相关信息
+ * @param flavor
+ * @return
+ */
+def getFlavorsInfo(String flavor) {
+    return rootProject.ext.productConfig.get(flavor)
+}
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd_HH-mm-ss")
+}
+
+def currentData() {
+    return new SimpleDateFormat("yy_MM_dd").format(new Date())
 }
 
 

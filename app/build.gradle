@@ -8,18 +8,9 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
 
-//    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
-//    rootProject.ext.currentFlavor = getCurrentFlavor()
-//    println("=================> rootProject.ext.currentFlavor: " + rootProject.ext.currentFlavor)
-//    println("=================> current: " + getCurrentFlavor())
-
-//    rootProject.ext.currentInfo = getFlavorInfo()
-//    rootProject.ext.currentInfo.each { data ->
-//        println("=================> key: " + data.key + "  value: " + getAttribute(data.key))
-//    }
-
     defaultConfig {
         println("=================> defaultConfig currentFlavor: " + rootProject.ext.currentFlavor)
+        println("=======================> rootProject name:" + project.getName())
         applicationId "com.cold.flavorsdemo"
         minSdkVersion 15
         targetSdkVersion 29
@@ -113,32 +104,24 @@ android {
     sourceSets {
         println("=================> sourceSets currentFlavor: " + rootProject.ext.currentFlavor)
 
-//        v_test1 {
-//
-//        }
-//
-//        v_test2 {
-//
-//        }
+        ayome {
+//            res.srcDirs += ['src/main/adapter/res']
+//            java.srcDirs += ['src/flavor/debug/src']
+//            res.srcDirs += ['src/flavor/debug/res']
+//            manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
+        }
+
+        ayome1 {
+
+        }
 
         sourceSets.all { sourceSet ->
-//            if(rootProject.ext.isDebug) {
-//                manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
-//                java.srcDirs += ['src/flavor/debug/src']
-//                res.srcDirs += ['src/flavor/debug/res']
-//            } else {
-//                java.srcDirs += ['src/flavor/debug/src']
-//            }
-
-            //            println("=================> sourceSets name1: ${sourceSet.name}")
             def name = getFlavorName(sourceSet.name)
-//            println("=================> sourceSet name2: ${name}")
             def info = getFlavorsInfo(name)
             if(sourceSet != null
                     && info != null
                     && sourceSet.toString().contains(name) != null) {
-//                main.java.srcDirs += ['src/flavor/debug/src']
-//                println("=================> sourceSet name3: ${name}")
+                println("=============================================================================================> sourceSet name3: ${name}")
                 if(rootProject.isDebug) {
                     sourceSet.java.srcDirs += ['src/flavor/debug/src']
                     sourceSet.res.srcDirs += ['src/flavor/debug/res']
@@ -158,7 +141,7 @@ android {
             def fileName
 //            println("=====================> isCurrentFlavorNotNull(): " + isCurrentFlavorNotNull())
             if(isCurrentFlavorNotNull() && outputFile != null && outputFile.name.endsWith('.apk')) {
-                if (variant.buildType.name.equals('release')) {
+                if (variant.buildType.name == ('release')) {
                     // 这里只是设置outputFileName这个变量，只有release才会设置，打包release时输出apk就会在该路径下
                     fileName = "${getConfigValue('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${getConfigValue('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.apk"
                     outputFileName = new File("../../../../../../outputApk/${new SimpleDateFormat("yy_MM_dd").format(new Date())}", fileName).toString()
@@ -212,7 +195,7 @@ android {
                     def fromPath = "${buildDir}\\outputs\\bundle\\${flavor}\\"
                     println("=================> equalsIgnoreCase3 fromPath: " + fromPath)
                     // app-google-ayome-release.aab
-                    def archive = "app-${getConfigValue('group')}-${rootProject.ext.currentFlavor}-release.aab"
+                    def archive = "${project.getName()}-${getConfigValue('group')}-${rootProject.ext.currentFlavor}-release.aab"
                     println("=================> equalsIgnoreCase3 rootProject.ext.currentFlavor: " + "${rootProject.ext.currentFlavor}")
                     println("=================> equalsIgnoreCase3 archive: " + archive)
                     def myName = "${getConfigValue('app_name')}_v${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}_${getConfigValue('channel')}_${rootProject.isDebug ? "Debug" : "Release"}.aab"
@@ -269,10 +252,6 @@ def String getFlavorName(String name){
             .replaceAll("release", "")
             .replaceAll("test","")
             .replaceAll("android", "");
-}
-
-def getFlavorsInfo(String flavor) {
-    return rootProject.ext.productConfig.get(flavor)
 }
 
 def getAttribute(String key) {
