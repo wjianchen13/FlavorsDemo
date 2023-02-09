@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from : file('flavorsConfig.gradle')
 apply from : file('scripts/utils.gradle')
+apply from : file('scripts/flavorsConfig.gradle')
 
 buildscript {
     repositories {

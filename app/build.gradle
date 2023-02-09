@@ -5,15 +5,15 @@ import java.util.regex.Pattern
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
     buildToolsVersion "29.0.2"
 
     defaultConfig {
         println("=================> defaultConfig currentFlavor: " + rootProject.ext.currentFlavor)
         println("=======================> rootProject name:" + project.getName())
         applicationId "com.cold.flavorsdemo"
-        minSdkVersion 15
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode rootProject.versionCode
         versionName rootProject.versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -81,7 +81,6 @@ android {
 
             if (isCurrentFlavorNotNull()) {
                 versionCode getConfigValue('versionCode')
-                versionCode getConfigValue('versionCode')
                 versionName "${getConfigValue('versionName')}"
                 buildConfigField "String", "WX_KEY", "\"wx7ecd5e9701f3adaf\""
                 buildConfigField "String", "WX_SECRET", "\"af9a655b3437b86a27b649272d3c0f0e\""
@@ -107,7 +106,6 @@ android {
         ayome {
 //            res.srcDirs += ['src/main/adapter/res']
 //            java.srcDirs += ['src/flavor/debug/src']
-//            res.srcDirs += ['src/flavor/debug/res']
 //            manifest.srcFile 'src/flavor/debug/AndroidManifest.xml'
         }
 
@@ -182,7 +180,6 @@ android {
      */
     tasks.whenTaskAdded { task ->
         if (task.name.startsWith("bundle")) {
-//            def info = getFlavorInfo()
             if(isCurrentFlavorNotNull()) {
 //                println("=================================================> task.name: " + task.name)
                 def flavor = task.name.substring("bundle".length()).uncapitalize()
@@ -243,27 +240,6 @@ android {
 
 }
 
-def String getFlavorName(String name){
-    if (!name)
-        return "";
-    return name
-            .toLowerCase()
-            .replaceAll("debug", "")
-            .replaceAll("release", "")
-            .replaceAll("test","")
-            .replaceAll("android", "");
-}
-
-def getAttribute(String key) {
-    rootProject.ext.currentInfo.get(key)
-}
-
-def getFlavorInfo() {
-    def name = getCurrentFlavor()
-//    println("=================> name: " + name)
-    return rootProject.ext.productConfig.get(name)
-}
-
 def getCurrentFlavor() {
     Gradle gradle = getGradle()
     String  tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
@@ -280,25 +256,16 @@ def getCurrentFlavor() {
     if( matcher.find())
         return matcher.group(1).toLowerCase()
     else {
-//        println "NO MATCH FOUND"
-        return "";
+        println "NO MATCH FOUND"
+        return ""
     }
 }
-
-def releaseTime() {
-    return new Date().format("yyyy-MM-dd_HH-mm-ss")
-}
-
-def currentData() {
-    return new SimpleDateFormat("yy_MM_dd").format(new Date())
-}
-
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation project(path: ':lib_common')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
