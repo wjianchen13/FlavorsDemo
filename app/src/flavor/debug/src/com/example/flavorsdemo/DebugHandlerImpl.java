@@ -1,6 +1,6 @@
 package com.example.flavorsdemo;
 
-import com.example.lib_common.IDebugHandler;
+import com.example.lib_common.debug.IDebugHandler;
 
 /**
  * DebugHandler Debug

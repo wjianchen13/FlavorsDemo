@@ -4,7 +4,7 @@ ext {
     // 打包时改成对应的flavor name
     currentFlavor = ''
     curVariantsName = ''
-    isDebug = false
+    isDebug = true
 
     // 当前谷歌aab渠道 gf00001 正式服release 测试服debug渠道号test001
     channel = 'gf00001'

@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.lib_common.DebugHandler;
+import com.example.lib_common.debug.DebugHandler;
+import com.example.lib_common.flavor.FlavorHandler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,4 +24,9 @@ public class MainActivity extends AppCompatActivity {
         String test = DebugHandler.getInstance().getText();
         tvTest1.setText(test);
     }
+
+    public void onShow(View v) {
+        FlavorHandler.getInstance().showToast(this);
+    }
+
 }

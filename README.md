@@ -4,6 +4,9 @@
 
 android studio使用gradle作为构建工具，这里简单记录一下使用gradle进行多渠道打包的基础知识
 
+## 笔记
+笔记是这个：220209_gradle教程笔记
+
 ## 配置flavorDimensions
 这个是配置多维度，必须配置，可以是一个或多个维度
 如果只有1个维度，在productFlavors里可以不指定这个维度，如果有多个维度，必须指定是哪个维度

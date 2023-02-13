@@ -95,6 +95,7 @@ android {
         ayome1 {
             signingConfig signingConfigs.test2
             dimension "version"
+            resValue("string", "app_name", "\"${getConfigValue('app_name')}\"")
         }
     }
 
@@ -253,9 +254,9 @@ def getCurrentFlavor() {
 
     Matcher matcher = pattern.matcher( tskReqStr )
 
-    if( matcher.find())
+    if( matcher.find()) {
         return matcher.group(1).toLowerCase()
-    else {
+    } else {
         println "NO MATCH FOUND"
         return ""
     }
@@ -264,6 +265,8 @@ def getCurrentFlavor() {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':lib_common')
+    googleImplementation project(path: ':lib_main')
+    marketImplementation project(path: ':lib_market')
 
     implementation rootProject.ext.dependencies.appcompat
     implementation rootProject.ext.dependencies.constraintlayout
