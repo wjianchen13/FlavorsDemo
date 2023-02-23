@@ -47,6 +47,8 @@ android {
             shrinkResources false
             signingConfig null // 配置debug模式下的签名，在productFlavors里面配置
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+//            resValue("string", "app_name", "\"${getConfigValue('app_name')}\"")
+            matchingFallbacks = ['debug','release']
         }
 
         debug {
@@ -265,9 +267,10 @@ def getCurrentFlavor() {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':lib_common')
-    googleImplementation project(path: ':lib_main')
-    marketImplementation project(path: ':lib_market')
-
+//    googleImplementation project(path: ':lib_main')
+//    marketImplementation project(path: ':lib_market')
+    implementation project(path: ':lib_main')
+    implementation project(path: ':lib_market')
     implementation rootProject.ext.dependencies.appcompat
     implementation rootProject.ext.dependencies.constraintlayout
     testImplementation rootProject.ext.dependencies.junit
